@@ -4,6 +4,10 @@ on:
   push:
     branches: [ "main" ]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: lemonades-runner/test-api:main
+
 jobs:
   run-docker-container:
     name: Run Docker Container from the GitHub Container Registry
@@ -17,6 +21,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run with Docker Compose
         uses: hoverkraft-tech/compose-action@v1.5.1
         with:
@@ -24,5 +35,5 @@ jobs:
           down-flags: "--volumes"
         env:
           ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
-          PROXY_IMAGE: ghcr.io/lemonades-runner/test-api:main
+          PROXY_IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           PROXY_PORT: 8001
