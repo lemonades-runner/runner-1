@@ -21,7 +21,6 @@ services:
     environment:
       STATE_DIRECTORY: /mnt
       ZROK_ENABLE_TOKEN: ${ZROK_TOKEN}
-      ZROK_API_ENDPOINT: https://zrok.io
       ZROK_ENVIRONMENT_NAME: docker-public-share
 
   # provision a temporary zrok frontend subdomain and start sharing the backend target
