@@ -42,7 +42,7 @@ services:
 
       # most relevant options
       ZROK_BACKEND_MODE: proxy  # web, caddy, drive, proxy
-      ZROK_TARGET: http://localhost:8001  # backend target, is a path in container filesystem unless proxy mode
+      ZROK_TARGET: http://zrok-test:8001  # backend target, is a path in container filesystem unless proxy mode
       ZROK_INSECURE: --insecure  # "--insecure" if proxy target has unverifiable TLS server certificate
       ZROK_OAUTH_PROVIDER:  # google, github
       ZROK_OAUTH_EMAILS:    # allow space-separated list of OAuth email address glob patterns
