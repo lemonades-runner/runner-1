@@ -32,8 +32,8 @@ jobs:
         uses: ndeloof/install-compose-action@v0.0.1
         with:
           version: v2.1.0 # defaults to 'latest'
-          legacy: true    # will also install in PATH as `docker-compose`
-      - run: docker-compose up
+          legacy: false    # will also install in PATH as `docker-compose`
+      - run: docker compose up
         env:
           ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
           PROXY_IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
