@@ -55,6 +55,8 @@ services:
   # demo server you can share with zrok
   zrok-test:
     image: ${PROXY_IMAGE}
+    ports:
+      - "8001:8001"
 
 volumes:
   zrok_env:
