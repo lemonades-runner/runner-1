@@ -29,8 +29,9 @@ services:
     restart: no
     entrypoint: zrok-share.bash
     depends_on:
-      zrok-enable:
-        condition: service_completed_successfully
+      - zrok-test
+      - zrok-enable
+          - condition: service_completed_successfully
     volumes:
       - zrok_env:/mnt
     environment:
