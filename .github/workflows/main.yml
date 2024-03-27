@@ -28,11 +28,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run with Docker Compose
-        uses: hoverkraft-tech/compose-action@v1.5.1
+      - name: Install Docker Compose
+        uses: ndeloof/install-compose-action@v0.0.1
         with:
-          compose-file: "./docker-compose.yml"
-          down-flags: "--volumes"
+          version: v2.1.0 # defaults to 'latest'
+          legacy: true    # will also install in PATH as `docker-compose`
+      - run: docker-compose up
         env:
           ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
           PROXY_IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
