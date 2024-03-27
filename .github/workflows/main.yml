@@ -1,0 +1,28 @@
+name: Run
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  run-docker-container:
+    name: Run Docker Container from the GitHub Container Registry
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run with Docker Compose
+        uses: hoverkraft-tech/compose-action@v1.5.1
+        with:
+          compose-file: "./docker/docker-compose.yml"
+          down-flags: "--volumes"
+        env:
+          ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
+          PROXY_URL: ghcr.io/lemonades-runner/test-api:main
+          PROXY_PORT: 8001
