@@ -31,8 +31,8 @@ jobs:
       - name: Install Docker Compose
         uses: ndeloof/install-compose-action@v0.0.1
         with:
-          version: v2.1.0 # defaults to 'latest'
-          legacy: false    # will also install in PATH as `docker-compose`
+          version: 'latest'
+          legacy: false
       - run: docker compose up
         env:
           ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
