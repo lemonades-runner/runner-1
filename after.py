@@ -2,6 +2,7 @@ import os
 from time import sleep
 from subprocess import run
 from upstream import prepare_upstream
+from dotenv import load_dotenv
 
 # Get pod lifetime
 LIFETIME = os.getenv('LIFETIME')
@@ -9,6 +10,8 @@ if LIFETIME:
     LIFETIME = int(LIFETIME)
 else:
     LIFETIME = 3 * 60 * 60  # 3 hours lifetime by default
+
+load_dotenv()
 
 # Share the upstream
 UPSTREAM_NAME = os.getenv('UPSTREAM_NAME')
