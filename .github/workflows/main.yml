@@ -7,10 +7,11 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: lemonades-runner/test-api:main
+  RUBECTL_API: https://rubeapi.share.zrok.io
 
 jobs:
   run-docker-container:
-    name: Run Docker Container from the GitHub Container Registry
+    name: Run Rubectl Deployment
     runs-on: ubuntu-latest
 
     permissions:
@@ -21,20 +22,63 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Log in to the Container registry
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install requirements.txt
+
+      - name: Connect to Rubectl API to get a deployment to .env
+        run: python3 -m deployment
+        env:
+          RUBECTL_API: ${{ env.RUBECTL_API }}
+
+      - name: Export deployment info
+        run: |
+          set -a
+          source .env
+
+      - name: Log in to Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Docker Compose
+      - name: Install zrok
+        run: sudo apt-get install zrok
+
+      - name: Enable zrok environment
+        run: zrok enable ${{ secrets.ZROK_TOKEN }} -d ${{ env.UPSTREAM_NAME }}-env
+
+      - name: Reserve a domain name
+        run: zrok reserve public localhost:8001 -n ${{ env.UPSTREAM_NAME }}
+
+      - name: Run Docker Compose
         uses: ndeloof/install-compose-action@v0.0.1
         with:
           version: 'latest'
           legacy: false
-      - run: docker compose up
+      - run: docker compose up -d
         env:
           ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
-          PROXY_IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          REGISTRY: ${{ env.REGISTRY }}
+          PROXY_IMAGE: ${{ env.DEPLOYMENT_IMAGE }}
           PROXY_PORT: 8001
+
+      - name: Connect to Rubectl API to post an upstream and wait
+        run: python3 -m upstream
+        env:
+          RUBECTL_API: ${{ env.RUBECTL_API }}
+          DEPLOYMENT_UUID: ${{ env.DEPLOYMENT_UUID }}
+          UPSTREAM_URL: ${{ env.UPSTREAM_URL }}
+
+      - name: Release the domain name
+        run: zrok release ${{ env.UPSTREAM_NAME }}
+
+      - name: Disable zrok environment
+        run: zrok disable
