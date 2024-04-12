@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  ZROK_IMAGE: runner
+  ZROK_IMAGE: ghcr.io/lemonades-runner/runner:main
   RUBECTL_API: https://rubeapi.share.zrok.io
   LIFETIME: 10800
 
@@ -52,7 +52,7 @@ jobs:
           legacy: false
       - run: docker compose up -d
         env:
-          ZROK_IMAGE: ${{ env.REGISTRY }}/${{ env.ZROK_IMAGE }}
+          ZROK_IMAGE: ${{ env.ZROK_IMAGE }}
           ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
 
       - name: Publication
