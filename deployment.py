@@ -1,6 +1,7 @@
 import os
 from requests import get
 from uuid import uuid4
+from dotenv import load_dotenv
 
 RUBECTL_API = os.getenv('RUBECTL_API')
 resp = get(f'{RUBECTL_API}/api/v1/deployments/weakest')
@@ -16,3 +17,6 @@ if resp.status_code == 200:
         print('Successfully fetched envs:')
         print(envs)
         f.write(envs)
+
+
+load_dotenv()
