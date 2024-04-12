@@ -40,17 +40,19 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Docker compose setup
+        uses: ndeloof/install-compose-action@v0.0.1
+        with:
+          version: 'latest'
+          legacy: false
+
       - name: Preparation
         run: python3 -m before
         env:
           RUBECTL_API: ${{ env.RUBECTL_API }}
 
       - name: Deployment
-        uses: ndeloof/install-compose-action@v0.0.1
-        with:
-          version: 'latest'
-          legacy: false
-      - run: docker compose up -d
+        run: docker compose up -d
         env:
           ZROK_IMAGE: ${{ env.ZROK_IMAGE }}
           ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
