@@ -6,8 +6,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: lemonades-runner/test-api:main
   RUBECTL_API: https://rubeapi.share.zrok.io
+  LIFETIME: 10800
 
 jobs:
   run-docker-container:
@@ -32,8 +32,14 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Connect to Rubectl API to get a deployment to .env
-        run: python3 -m deployment
+      - name: Install zrok
+        run: |
+          sudo apt-get install curl
+          curl -sSLfo ./zrok-install.bash https://get.openziti.io/install.bash
+          sudo bash ./zrok-install.bash zrok
+
+      - name: Prepare to deploy
+        run: python3 -m before
         env:
           RUBECTL_API: ${{ env.RUBECTL_API }}
 
@@ -43,18 +49,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install zrok
-        run: |
-          sudo apt-get install curl
-          curl -sSLfo ./zrok-install.bash https://get.openziti.io/install.bash
-          sudo bash ./zrok-install.bash zrok
-
-      - name: Enable zrok environment
-        run: zrok enable ${{ secrets.ZROK_TOKEN }} -d ${{ env.UPSTREAM_NAME }}-env
-
-      - name: Reserve a domain name
-        run: zrok reserve public localhost:8001 -n ${{ env.UPSTREAM_NAME }}
 
       - name: Run Docker Compose
         uses: ndeloof/install-compose-action@v0.0.1
@@ -68,15 +62,8 @@ jobs:
           PROXY_IMAGE: ${{ env.DEPLOYMENT_IMAGE }}
           PROXY_PORT: 8001
 
-      - name: Connect to Rubectl API to post an upstream and wait
-        run: python3 -m upstream
+      - name: Notify Rubectl about the upstream
+        run: python3 -m after
         env:
           RUBECTL_API: ${{ env.RUBECTL_API }}
-          DEPLOYMENT_UUID: ${{ env.DEPLOYMENT_UUID }}
-          UPSTREAM_URL: ${{ env.UPSTREAM_URL }}
-
-      - name: Release the domain name
-        run: zrok release ${{ env.UPSTREAM_NAME }}
-
-      - name: Disable zrok environment
-        run: zrok disable
+          LIFETIME: ${{ env.LIFETIME }}
