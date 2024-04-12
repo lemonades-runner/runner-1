@@ -60,8 +60,6 @@ jobs:
       - run: docker compose up -d
         env:
           REGISTRY: ${{ env.REGISTRY }}
-          PROXY_IMAGE: ${{ env.DEPLOYMENT_IMAGE }}
-          PROXY_PORT: 8001
 
       - name: Notify Rubectl about the upstream
         run: python3 -m after

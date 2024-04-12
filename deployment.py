@@ -20,6 +20,12 @@ def prepare_deployment():
             print(envs)
             f.write(envs)
 
+        # Adding deployment image to docker compose
+        with open('docker-compose.yml', 'r', encoding='utf-8') as f:
+            docker_compose = f.read().replace('${PROXY_IMAGE}', deployment['image'])
+        with open('docker-compose.yml', 'w', encoding='utf-8') as f:
+            f.write(docker_compose)
+
         load_dotenv()
         return True
 
