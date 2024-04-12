@@ -1,15 +1,30 @@
 import os
-from subprocess import run
-from deployment import prepare_deployment
+import requests
+import uuid
+import dotenv
 
-ZROK_TOKEN = os.getenv('ZROK_TOKEN')
+# Load environmental variables
+RUBECTL_API = os.getenv('RUBECTL_API')
 
-# Prepare deployment
-prepare_deployment()
-UPSTREAM_NAME = os.getenv('UPSTREAM_NAME')
+# Load deployment from the API
+resp = requests.get(f'{RUBECTL_API}/api/v1/deployments/weakest')
+resp.raise_for_status()
+deployment = resp.json()['data']
 
-# Enable zrok environment
-run(['zrok', 'enable', ZROK_TOKEN, '-d', UPSTREAM_NAME])
+# Generate upstream name and url
+upstream_name = str(uuid.uuid4()).replace('-', '').strip()[:8]
+upstream_url = f'https://{upstream_name}.share.zrok.io'
 
-# Reserve a domain name
-run(['zrok', 'reserve', 'public', 'localhost:8001', '-n', UPSTREAM_NAME])
+# Add information to docker compose
+with open('docker-compose.yml', 'r', encoding='utf-8') as f:
+    docker_compose = f.read()
+    docker_compose = docker_compose.replace('${DEPLOYMENT_IMAGE}', deployment['image'])
+    docker_compose = docker_compose.replace('${UPSTREAM_NAME}', upstream_name)
+with open('docker-compose.yml', 'w', encoding='utf-8') as f:
+    f.write(docker_compose)
+
+# Save environmental variables
+open('.env', 'x', encoding='utf-8').close()
+dotenv.set_key('.env', 'DEPLOYMENT_UUID', deployment['uuid'])
+dotenv.set_key('.env', 'UPSTREAM_NAME', upstream_name)
+dotenv.set_key('.env', 'UPSTREAM_URL', upstream_url)

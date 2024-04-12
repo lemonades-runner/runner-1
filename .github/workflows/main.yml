@@ -6,12 +6,13 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  ZROK_IMAGE: runner
   RUBECTL_API: https://rubeapi.share.zrok.io
   LIFETIME: 10800
 
 jobs:
-  run-docker-container:
-    name: Run Rubectl Deployment
+  deployment-and-publication:
+    name: Rubectl Deployment and Publication
     runs-on: ubuntu-latest
 
     permissions:
@@ -19,48 +20,42 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout repository
+      - name: Git repository setup
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Install zrok
-        run: |
-          sudo apt-get install curl
-          curl -sSLfo ./zrok-install.bash https://get.openziti.io/install.bash
-          sudo bash ./zrok-install.bash zrok
-
-      - name: Prepare to deploy
-        run: python3 -m before
-        env:
-          RUBECTL_API: ${{ env.RUBECTL_API }}
-          ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
-
-      - name: Log in to Container registry
+      - name: Container registry setup
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Docker Compose
+      - name: Python setup
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Preparation
+        run: python3 -m before
+        env:
+          RUBECTL_API: ${{ env.RUBECTL_API }}
+
+      - name: Deployment
         uses: ndeloof/install-compose-action@v0.0.1
         with:
           version: 'latest'
           legacy: false
       - run: docker compose up -d
         env:
-          REGISTRY: ${{ env.REGISTRY }}
+          ZROK_IMAGE: ${{ env.REGISTRY }}/${{ env.ZROK_IMAGE }}
+          ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
 
-      - name: Notify Rubectl about the upstream
+      - name: Publication
         run: python3 -m after
         env:
           RUBECTL_API: ${{ env.RUBECTL_API }}
