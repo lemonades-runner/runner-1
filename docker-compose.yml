@@ -16,7 +16,7 @@ services:
     image: ${ZROK_IMAGE}
     depends_on:
       deployment:
-        condition: service_started
+        condition: service_healthy
     environment:
       ZROK_TOKEN: ${ZROK_TOKEN}
       UPSTREAM_NAME: ${UPSTREAM_NAME}
