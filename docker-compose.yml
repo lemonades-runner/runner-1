@@ -4,19 +4,13 @@ services:
     image: ${DEPLOYMENT_IMAGE}
     ports:
       - "8001:8001"
-    healthcheck:
-      test: curl --fail http://localhost:8001
-      interval: 20s
-      retries: 5
-      start_period: 30s
-      timeout: 15s
 
   # Publication service
   zrok:
     image: ${ZROK_IMAGE}
     depends_on:
       deployment:
-        condition: service_healthy
+        condition: service_started
     environment:
       ZROK_TOKEN: ${ZROK_TOKEN}
       UPSTREAM_NAME: ${UPSTREAM_NAME}
