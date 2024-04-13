@@ -77,7 +77,7 @@ def main():
     if publication_is_ready():
         post_upstream()
         live()
-    publication_finish()
+    # publication_finish()  # no zrok here so this should be in docker
 
 
 if __name__ == '__main__':
