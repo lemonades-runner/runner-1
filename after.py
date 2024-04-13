@@ -17,7 +17,8 @@ status = 500
 while status != 200:
     resp = requests.get(UPSTREAM_URL)
     status = resp.status_code
-    print(f'\rDeployment status: {status}', end='', flush=True)
+    print(f'Deployment status: {status}', flush=True)
+    time.sleep(2)
 print()
 
 # Setup pod lifetime
@@ -37,7 +38,8 @@ resp = resp.json()['data']
 # Wait until death
 for i in range(LIFETIME):
     time.sleep(1)
-    print(f'\rAlive: {i + 1}/{LIFETIME}', end='', flush=True)
+    if i % 10 == 0:
+        print(f'Alive: {i + 1}/{LIFETIME}', flush=True)
 print()
 
 # Release the domain name
