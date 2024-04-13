@@ -28,13 +28,13 @@ def publication_is_ready(attempts: int = 10):
     for i in range(10):
         try:
             if requests.get(f'{UPSTREAM_URL}/healthz').status_code == 200:
-                print('Publication available.')
+                print('Publication available.', flush=True)
                 return True
         except Exception as e:
             print(e)
-        print(f'Publication unavailable. Attempt: {i}/{attempts}.')
+        print(f'Publication unavailable. Attempt: {i}/{attempts}.', flush=True)
         time.sleep(3)
-    print('Publication unavailable. No more attempts.')
+    print('Publication unavailable. No more attempts.', flush=True)
     return False
 
 

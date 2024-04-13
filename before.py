@@ -22,8 +22,8 @@ with open('docker-compose.yml', 'r', encoding='utf-8') as f:
     docker_compose = docker_compose.replace('${UPSTREAM_NAME}', upstream_name)
 with open('docker-compose.yml', 'w', encoding='utf-8') as f:
     f.write(docker_compose)
-print('Changed docker-compose.yml:')
-print(docker_compose)
+print('Changed docker-compose.yml:', flush=True)
+print(docker_compose, flush=True)
 
 # Save environmental variables
 open('.env', 'x', encoding='utf-8').close()
