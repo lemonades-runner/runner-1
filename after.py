@@ -15,7 +15,7 @@ DEPLOYMENT_UUID = os.getenv('DEPLOYMENT_UUID')
 # Wait until live
 status = 500
 while status != 200:
-    resp = requests.get('http://deployment:8001/healthz', verify=False)
+    resp = requests.get(UPSTREAM_URL)
     status = resp.status_code
     print(f'\rDeployment status: {status}', end='', flush=True)
 print()
