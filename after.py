@@ -12,6 +12,14 @@ UPSTREAM_URL = os.getenv('UPSTREAM_URL')
 RUBECTL_API = os.getenv('RUBECTL_API')
 DEPLOYMENT_UUID = os.getenv('DEPLOYMENT_UUID')
 
+# Wait until live
+status = 500
+while status != 200:
+    resp = requests.get('http://deployment:8001/healthz', verify=False)
+    status = resp.status_code
+    print(f'\rDeployment status: {status}', end='', flush=True)
+print()
+
 # Setup pod lifetime
 if LIFETIME:
     LIFETIME = int(LIFETIME)
@@ -29,7 +37,8 @@ resp = resp.json()['data']
 # Wait until death
 for i in range(LIFETIME):
     time.sleep(1)
-    print(f'Alive: {i + 1}/{LIFETIME}')
+    print(f'\rAlive: {i + 1}/{LIFETIME}', end='', flush=True)
+print()
 
 # Release the domain name
 subprocess.run(['zrok', 'release', UPSTREAM_NAME])
