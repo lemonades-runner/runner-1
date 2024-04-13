@@ -14,3 +14,4 @@ services:
     environment:
       ZROK_TOKEN: ${ZROK_TOKEN}
       UPSTREAM_NAME: ${UPSTREAM_NAME}
+      DEPLOYMENT_URL: http://deployment:8001
