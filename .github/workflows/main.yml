@@ -52,7 +52,7 @@ jobs:
           RUBECTL_API: ${{ env.RUBECTL_API }}
 
       - name: Deployment
-        run: docker compose up -d --wait
+        run: docker compose up
         env:
           ZROK_IMAGE: ${{ env.ZROK_IMAGE }}
           ZROK_TOKEN: ${{ secrets.ZROK_TOKEN }}
